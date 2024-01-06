@@ -1,9 +1,9 @@
 const express = require("express")
-const mongoose = req('mongoose');
+const mongoose = require('mongoose');
 
 const app = express()
 const port = 3000
-mongoose.connect('mongodb://127.0.0.1:27017/test');
+
 
 const Car = mongoose.model('Car', {
     name: String,
@@ -12,13 +12,38 @@ const Car = mongoose.model('Car', {
     identify: String
 });
 
+app.get("/", async (req, res) => {
+    const cars = await Car.find()
+    return res.send(cars)
+})
+
+app.delete("/:id", async (req, res) => {
+    const car = await Car.findByIdAndDelete(req.params.id)
+    return res.send(car)
+})
+
+app.put("/:id", async(req, res) => {
+    const car = await Car.findByIdAndUpdate(req.params.id, {
+        name: req.body.name,
+        model: req.body.model,
+        color: req.body.color,
+        identify: req.identify
+    })
+    return res.send(car)
+})
+
 app.post("/", async (req, res) => {
     const car = new Car({
-        name: req.body.title,
-        model: req.body.title,
-        color: req.body.title,
-        identify: req.title
+        name: req.body.name,
+        model: req.body.model,
+        color: req.body.color,
+        identify: req.identify
     })
     await car.save()
-    res.send(car)
+    return res.send(car)
+})
+
+app.listen(port, () => {
+    mongoose.connect('mongodb://127.0.0.1:27017/test');
+    console.log('App running')
 })
